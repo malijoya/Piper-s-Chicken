@@ -1,0 +1,99 @@
+@import "tailwindcss";
+
+@theme {
+  --color-brand-red: #dc2626;
+  --color-brand-red-hover: #b91c1c;
+  --color-brand-orange: #ea580c;
+  --color-brand-yellow: #f59e0b;
+  --color-brand-yellow-hover: #d97706;
+  --color-brand-black: #09090b;
+  --color-brand-dark: #18181b;
+  --color-brand-gray: #27272a;
+  
+  --font-display: "Outfit", system-ui, sans-serif;
+  --font-body: "Inter", system-ui, sans-serif;
+  
+  --animate-float: float 6s ease-in-out infinite;
+  --animate-pulse-slow: pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-12px); }
+  }
+}
+
+@utility bg-grid-pattern {
+  background-image: radial-gradient(rgba(220, 38, 38, 0.1) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+@utility text-glow-red {
+  text-shadow: 0 0 12px rgba(220, 38, 38, 0.5);
+}
+
+@utility text-glow-gold {
+  text-shadow: 0 0 12px rgba(245, 158, 11, 0.5);
+}
+
+@utility box-glow-red {
+  box-shadow: 0 0 25px rgba(220, 38, 38, 0.15);
+}
+
+@utility box-glow-gold {
+  box-shadow: 0 0 25px rgba(245, 158, 11, 0.15);
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-brand-black);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-brand-gray);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-brand-red);
+}
+
+html {
+  scroll-behavior: smooth;
+  background-color: var(--color-brand-black);
+  color: #f4f4f5;
+  font-family: var(--font-body);
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  overflow-x: hidden;
+}
+
+#root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Page transitions */
+.page-enter {
+  opacity: 0;
+  transform: translateY(10px);
+}
+.page-enter-active {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 300ms, transform 300ms;
+}
+.page-exit {
+  opacity: 1;
+  transform: translateY(0);
+}
+.page-exit-active {
+  opacity: 0;
+  transform: translateY(-10px);
+  transition: opacity 300ms, transform 300ms;
+}
