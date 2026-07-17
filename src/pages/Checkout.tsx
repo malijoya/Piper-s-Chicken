@@ -13,6 +13,7 @@ export const Checkout = () => {
   const [address, setAddress] = useState('');
   const [instructions, setInstructions] = useState('');
   const [formErrors, setFormErrors] = useState<{ [key: string]: string }>({});
+  const [confirmRemoveId, setConfirmRemoveId] = useState<string | null>(null);
 
   const packagingFee = 50;
   const deliveryFee = orderType === 'delivery' ? 150 : 0;
@@ -120,67 +121,100 @@ export const Checkout = () => {
             </h2>
             
             <div className="flex flex-col gap-4">
-              {cartItems.map((cartItem) => (
+            {cartItems.map((cartItem) => (
                 <div
                   key={cartItem.item.id}
-                  className="flex items-center gap-4 bg-zinc-900/40 border border-zinc-850 p-4 rounded-2xl"
+                  className="flex flex-col bg-zinc-900/40 border border-zinc-850 p-4 rounded-2xl gap-3"
                 >
-                  <img
-                    src={cartItem.item.image}
-                    alt={cartItem.item.name}
-                    className="w-16 h-16 object-cover rounded-xl border border-zinc-800 shrink-0"
-                  />
-                  
-                  <div className="flex-grow min-w-0">
-                    <h3 className="font-display font-black text-sm uppercase text-white truncate leading-tight">
-                      {cartItem.item.name}
-                    </h3>
-                    <p className="text-xs text-zinc-500 mt-1">
-                      PKR {cartItem.item.price} each
-                    </p>
-                  </div>
-                  
-                  {/* Quantity Counter controls */}
-                  <div className="flex items-center bg-zinc-950 border border-zinc-800 rounded-full px-2 py-1 shrink-0">
+                  <div className="flex items-center gap-4">
+                    <img
+                      src={cartItem.item.image}
+                      alt={cartItem.item.name}
+                      className="w-16 h-16 object-cover rounded-xl border border-zinc-800 shrink-0"
+                    />
+                    
+                    <div className="flex-grow min-w-0">
+                      <h3 className="font-display font-black text-sm uppercase text-white truncate leading-tight">
+                        {cartItem.item.name}
+                      </h3>
+                      <p className="text-xs text-zinc-500 mt-1">
+                        PKR {cartItem.item.price} each
+                      </p>
+                    </div>
+                    
+                    {/* Quantity Counter controls */}
+                    <div className="flex items-center bg-zinc-950 border border-zinc-800 rounded-full px-2 py-1 shrink-0">
+                      <button
+                        onClick={() => {
+                          if (cartItem.quantity === 1) {
+                            setConfirmRemoveId(cartItem.item.id);
+                          } else {
+                            updateQuantity(cartItem.item.id, cartItem.quantity - 1);
+                          }
+                        }}
+                        className="p-1 text-zinc-400 hover:text-red-400 transition-colors focus:outline-none"
+                      >
+                        <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 12h-15" />
+                        </svg>
+                      </button>
+                      <span className="px-3 font-display font-bold text-xs text-white select-none">
+                        {cartItem.quantity}
+                      </span>
+                      <button
+                        onClick={() => updateQuantity(cartItem.item.id, cartItem.quantity + 1)}
+                        className="p-1 text-zinc-400 hover:text-white transition-colors focus:outline-none"
+                      >
+                        <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                        </svg>
+                      </button>
+                    </div>
+                    
+                    {/* Item Total Price */}
+                    <div className="text-right shrink-0 min-w-[70px]">
+                      <span className="font-display font-black text-sm text-red-500">
+                        PKR {cartItem.item.price * cartItem.quantity}
+                      </span>
+                    </div>
+
+                    {/* Remove item */}
                     <button
-                      onClick={() => updateQuantity(cartItem.item.id, cartItem.quantity - 1)}
-                      className="p-1 text-zinc-400 hover:text-white transition-colors focus:outline-none"
+                      onClick={() => setConfirmRemoveId(cartItem.item.id)}
+                      className="p-1 text-zinc-600 hover:text-red-500 transition-colors shrink-0"
+                      aria-label="Remove item"
                     >
-                      <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 12h-15" />
+                      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
                       </svg>
                     </button>
-                    <span className="px-3 font-display font-bold text-xs text-white select-none">
-                      {cartItem.quantity}
-                    </span>
-                    <button
-                      onClick={() => updateQuantity(cartItem.item.id, cartItem.quantity + 1)}
-                      className="p-1 text-zinc-400 hover:text-white transition-colors focus:outline-none"
-                    >
-                      <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-                      </svg>
-                    </button>
-                  </div>
-                  
-                  {/* Item Total Price */}
-                  <div className="text-right shrink-0 min-w-[70px]">
-                    <span className="font-display font-black text-sm text-red-500">
-                      PKR {cartItem.item.price * cartItem.quantity}
-                    </span>
                   </div>
 
-                  {/* Remove item */}
-                  <button
-                    onClick={() => removeFromCart(cartItem.item.id)}
-                    className="p-1 text-zinc-600 hover:text-red-500 transition-colors shrink-0"
-                    aria-label="Remove item"
-                  >
-                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                  </button>
-
+                  {/* Inline Remove Confirmation */}
+                  {confirmRemoveId === cartItem.item.id && (
+                    <div className="flex items-center justify-between gap-3 bg-red-950/40 border border-red-700/40 rounded-xl px-4 py-3">
+                      <span className="font-display font-bold text-xs text-red-300 uppercase tracking-wide">
+                        Remove <span className="text-white">{cartItem.item.name}</span> from order?
+                      </span>
+                      <div className="flex items-center gap-2 shrink-0">
+                        <button
+                          onClick={() => {
+                            removeFromCart(cartItem.item.id);
+                            setConfirmRemoveId(null);
+                          }}
+                          className="px-4 py-1.5 rounded-full bg-red-600 hover:bg-red-500 text-white font-display font-black text-xs uppercase tracking-wider transition-colors cursor-pointer"
+                        >
+                          Yes, Remove
+                        </button>
+                        <button
+                          onClick={() => setConfirmRemoveId(null)}
+                          className="px-4 py-1.5 rounded-full bg-zinc-800 hover:bg-zinc-700 text-zinc-300 font-display font-black text-xs uppercase tracking-wider transition-colors cursor-pointer"
+                        >
+                          Keep It
+                        </button>
+                      </div>
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
@@ -237,7 +271,10 @@ export const Checkout = () => {
                   type="text"
                   placeholder="e.g. Ali Khan"
                   value={name}
-                  onChange={(e) => setName(e.target.value)}
+                  onChange={(e) => {
+                    const val = e.target.value.replace(/[^a-zA-Z\s]/g, '');
+                    setName(val);
+                  }}
                   className={`w-full bg-zinc-950 border rounded-xl px-4 py-3 text-white placeholder-zinc-600 font-display text-sm focus:outline-none focus:ring-1 ${
                     formErrors.name ? 'border-red-500 focus:ring-red-500' : 'border-zinc-800 focus:border-red-500 focus:ring-red-500'
                   }`}
@@ -252,7 +289,12 @@ export const Checkout = () => {
                   type="tel"
                   placeholder="e.g. 03001234567"
                   value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
+                  onChange={(e) => {
+                    const val = e.target.value.replace(/\D/g, '');
+                    setPhone(val);
+                  }}
+                  inputMode="numeric"
+                  maxLength={11}
                   className={`w-full bg-zinc-950 border rounded-xl px-4 py-3 text-white placeholder-zinc-600 font-display text-sm focus:outline-none focus:ring-1 ${
                     formErrors.phone ? 'border-red-500 focus:ring-red-500' : 'border-zinc-800 focus:border-red-500 focus:ring-red-500'
                   }`}

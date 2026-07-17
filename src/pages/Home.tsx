@@ -1,11 +1,19 @@
+import { useState } from 'react';
 import { useRouter } from '../hooks/useRouter';
 import { useCart } from '../hooks/useCart';
 import { menuItems } from '../data/menu';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 
 export const Home = () => {
   const { navigate } = useRouter();
   const { addToCart } = useCart();
+  const [toast, setToast] = useState<{ id: number; name: string } | null>(null);
+
+  const showToast = (name: string) => {
+    const id = Date.now();
+    setToast({ id, name });
+    setTimeout(() => setToast(prev => (prev?.id === id ? null : prev)), 2500);
+  };
 
   // Pick top 3 items for home teaser (Zinger, Broast, Combo)
   const teaserItems = menuItems.filter(item => 
@@ -92,6 +100,27 @@ export const Home = () => {
 
   return (
     <div className="w-full">
+
+      {/* Toast Notification — bottom-right, vibrant */}
+      <AnimatePresence>
+        {toast && (
+          <motion.div
+            key={toast.id}
+            initial={{ opacity: 0, x: 60, scale: 0.9 }}
+            animate={{ opacity: 1, x: 0, scale: 1 }}
+            exit={{ opacity: 0, x: 60, scale: 0.9 }}
+            transition={{ type: 'spring', bounce: 0.35, duration: 0.45 }}
+            className="fixed bottom-6 right-6 z-[100] flex items-center gap-3 bg-gradient-to-r from-red-600 to-amber-500 text-black px-5 py-3.5 rounded-2xl shadow-2xl shadow-amber-500/40 pointer-events-none max-w-xs"
+          >
+            <span className="flex h-2.5 w-2.5 rounded-full bg-black/30 animate-pulse shrink-0" />
+            <span className="font-display font-black text-sm leading-tight">
+              <span className="block text-[10px] uppercase tracking-widest opacity-80 font-bold">Added to order!</span>
+              {toast.name}
+            </span>
+            <svg className="w-5 h-5 shrink-0 opacity-80" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" /></svg>
+          </motion.div>
+        )}
+      </AnimatePresence>
       
       {/* Hero Section */}
       <section className="relative overflow-hidden py-16 lg:py-28 bg-zinc-950 flex items-center">
@@ -279,6 +308,7 @@ export const Home = () => {
                     <button
                       onClick={() => {
                         addToCart(item, 1);
+                        showToast(item.name);
                       }}
                       className="inline-flex items-center justify-center px-5 py-2.5 rounded-full font-display font-extrabold text-xs text-black bg-amber-500 hover:bg-amber-600 transition-colors duration-300 uppercase tracking-wider cursor-pointer"
                     >
